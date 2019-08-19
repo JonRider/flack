@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flack</title>
+<!-- Get Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+
+body {
+
+}
+
+.sidenav {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #4527a0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.bottom-bar {
+  height: 60px;
+  width: 100%;
+  margin-left: -10px;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  background-color: #eceff1;
+}
+
+.main {
+  margin-left: 200px; /* Same as the width of the sidenav */
+  margin-bottom: 65px; /* Same as the height of the bottom bar + 5px*/
+  font-size: 28px; /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+.message-bar {
+  margin-right: 200px;
+}
+
+.sidebar-heading {
+  text-align: center;
+  font-size: 44px;
+}
+
+.title {
+  font-size: 36px;
+  color: #fff;
+  font-family: 'Permanent Marker', cursive;
+  text-align: center;
+}
+
+#channel {
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+#add {
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: normal;
+  color: #fff;
+}
+
+
+.channels {
+  font-size: 18px;
+  padding-left: 25px;
+  font-weight: 400;
+  color: #fff;
+}
+
+.channel-box, .add-box {
+
+  padding-top: 1px;
+  padding-bottom: 1px;
+
+}
+
+#new-channel {
+  margin: 5px 10px 5px 10px;
+  padding-right: 20px;
+  visibility: hidden;
+}
+
+.channel-box:hover, .add-box:hover {
+  background-color: #311b92;
+}
+
+svg {
+  padding-top: 5px;
+}
+
+.message {
+  background-color: #eceff1;
+  border-radius: 10px;
+  border-width: 5px;
+  border-left-style: solid;
+  border-color: #7283a7;
+  padding: 5px 10px 10px 10px;
+  margin-top: 10px;
+  width: 65%;
+}
+
+.message a {
+  font-size: 22px;
+}
+
+/* The popup form - hidden by default */
+.form-popup {
+  display: none;
+  position: relative;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // Point the default div
+    let def = document.querySelector('#default');
+    pointDiv(def);
+
+    // add a pointer and link to a div
+    function pointDiv(div) {
+      div.style.cursor = 'pointer';
+      div.onclick = function() {
+        window.location.href = 'www.google.com';
+      };
+    }
+
+    // Make add button a link
+    let add = document.querySelector('.add-box');
+    // Get the add channel element
+    let addChannel = document.querySelector('#add-channel');
+    add.style.cursor = 'pointer';
+
+    // Get new Channel
+    let newChannel = document.querySelector('#new-channel');
+    // Open Add Channel Input
+    add.onclick = function() {
+      // Make input field visible
+      if (newChannel.style.visibility == 'visible') {
+        newChannel.style.visibility = 'hidden';
+        // Focus back on the message input
+        input.focus();
+        input.select();
+      }
+      else {
+        newChannel.style.visibility = 'visible';
+        // Focus on the addChannel input field
+        addChannel.focus();
+        addChannel.select();
+      }
+    };
+
+    // Add a new channel
+    addChannel.addEventListener('keydown', function(e) {
+      let channel = addChannel.value;
+      if (e.code === "Enter" && channel) {
+          // Make Channel
+          makeChannel(channel);
+          // Reset text field
+          input.value = '';
+          newChannel.style.visibility = 'hidden';
+          // Focus back on the message input
+          input.focus();
+          input.select();
+          }
+    });
+
+
+    // Focus the Input Field on Intial Load
+    let input = document.getElementById('send');
+    input.focus();
+    input.select();
+    // Get input by enter key
+    input.addEventListener('keydown', function(e) {
+    let message = input.value;
+    if (e.code === "Enter" && message) {
+        // Send Message
+        addSent(message);
+        console.log(message);
+        // Reset text field
+        input.value = '';
+        }
+    });
+
+    function addSent(message) {
+      // Get message div
+      let div = document.getElementById('message-div');
+
+      // Build message bubble div
+      let bubble = document.createElement('div');
+      bubble.classList.add('message');
+      text = document.createElement('a');
+      text.innerHTML = message;
+      bubble.appendChild(text);
+
+      // Append message to div
+      div.appendChild(bubble);
+      // Keep scrolled to bottom of messages
+      window.scrollTo(0,document.body.scrollHeight);
+    }
+
+    function makeChannel(channel) {
+      let div = document.getElementById('channel-div');
+      // Build channel tag
+      let tag = document.createElement('div');
+      tag.classList.add('channel-box');
+      heading = document.createElement('h5');
+      heading.classList.add('channels');
+      heading.innerHTML = '<i class="fa fa-hashtag"></i> ' + channel;
+      tag.appendChild(heading);
+      div.appendChild(tag);
+      // Get a pointer for the div
+      pointDiv(div);
+
+    }
+
+  });
+</script>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidenav">
+
+  <h5 class="title"><svg height="24pt" viewBox="0 0 511 500" width="24pt" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="m454.550781 217.1875c14.160157 0 27.886719-5.453125 38.652344-15.351562 10.75-9.886719 17.347656-23.109376 18.585937-37.234376 1.28125-14.65625-3.304687-28.503906-12.917968-38.996093-9.574219-10.449219-22.898438-16.207031-37.546875-16.207031h-53.609375l4.699218-53.699219c1.285157-14.65625-3.300781-28.503907-12.914062-38.992188-9.574219-10.453125-22.898438-16.207031-37.519531-16.207031-14.160157 0-27.886719 5.449219-38.648438 15.347656-10.75 9.886719-17.355469 23.109375-18.589843 37.234375l-4.929688 56.316407h-63.226562l4.699218-53.703126c1.28125-14.652343-3.304687-28.503906-12.917968-38.988281-9.574219-10.453125-22.898438-16.207031-37.519532-16.207031-14.160156 0-27.886718 5.449219-38.648437 15.347656-10.75 9.886719-17.351563 23.109375-18.585938 37.234375l-4.929687 56.316407h-56.261719c-14.160156 0-27.886719 5.453124-38.652344 15.351562-10.75 9.886719-17.351562 23.109375-18.585937 37.238281-1.28125 14.65625 3.304687 28.503907 12.917968 38.996094 9.578126 10.449219 22.898438 16.203125 37.515626 16.203125h53.636718l-5.542968 63.34375h-56.265626c-14.15625 0-27.882812 5.453125-38.648437 15.351562-10.75 9.882813-17.351563 23.105469-18.585937 37.234376-1.28125 14.65625 3.304687 28.507812 12.917968 38.996093 9.574219 10.449219 22.898438 16.203125 37.515625 16.203125h53.640625l-4.699218 53.699219c-1.28125 14.660156 3.304687 28.507813 12.917968 38.996094 9.574219 10.453125 22.898438 16.207031 37.515625 16.207031 14.160157 0 27.886719-5.453125 38.648438-15.347656 10.75-9.886719 17.351562-23.109375 18.589843-37.238282.007813-.074218.011719-.144531.019532-.21875l4.90625-56.097656h63.230468l-4.695312 53.699219c-1.285156 14.65625 3.304688 28.503906 12.914062 38.996094 9.574219 10.449219 22.898438 16.207031 37.515626 16.207031 14.160156 0 27.886718-5.453125 38.652343-15.351562 10.75-9.886719 17.351563-23.109376 18.589844-37.234376.003906-.046874.007813-.09375.011719-.140624l4.914062-56.175782h56.265625c.136719 0 .269531 0 .402344-.003906 14.019531-.105469 27.585937-5.542969 38.246094-15.347656 10.75-9.886719 17.351562-23.109375 18.589843-37.234375 1.28125-14.65625-3.308593-28.503907-12.917968-38.996094-9.578125-10.449219-22.902344-16.203125-37.550782-16.203125h-53.609374l5.542968-63.347656h56.265625zm-164.164062 0-5.542969 63.34375h-63.230469l5.542969-63.34375zm0 0"/></svg> Flack</h5>
+  <hr>
+
+<!-- Channels -->
+  <h5 id="channel">CHANNELS</h5>
+  <div id="channel-div">
+  </div>
+  <div class="channel-box" id="default"><h5 class="channels"><i class="fa fa-hashtag"></i> default</h5></div>
+
+<!-- Add Channel -->
+  <hr>
+  <div class="add-box"><a class="font-weight-light" id="add"><i class="fa fa-plus-circle"></i> ADD A CHANNEL</a></div>
+  <div class="input-group" id="new-channel">
+    <input type="text" class="form-control"  id="add-channel" placeholder="Channel Name" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    <div class="input-group-append">
+      <button class="btn btn-secondary" type="button"><i class="fa fa-plus"></i></button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Main View -->
+<div class="main">
+
+  <!-- Message Div -->
+  <div id="message-div">
+  </div>
+
+  <!-- Message Bar -->
+  <div class="bottom-bar">
+    <div class="input-group message-bar">
+      <input type="text" class="form-control message-bar" id="send" placeholder="Enter Message Here" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>
