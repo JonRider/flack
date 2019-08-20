@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <!-- Add icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- Get AJAX -->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<!-- Get JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 <link href="https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
 
@@ -108,136 +112,23 @@ svg {
 }
 
 .message {
+  display: inline-block;
   background-color: #eceff1;
   border-radius: 10px;
   border-width: 5px;
   border-left-style: solid;
   border-color: #7283a7;
-  padding: 5px 10px 10px 10px;
+  padding: 5px 20px 10px 10px;
   margin-top: 10px;
-  width: 65%;
+  max-width: 80%;
+
 }
 
 .message a {
   font-size: 22px;
 }
 
-/* The popup form - hidden by default */
-.form-popup {
-  display: none;
-  position: relative;
-  border: 3px solid #f1f1f1;
-  z-index: 9;
-}
-
-
 </style>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-
-    // Point the default div
-    let def = document.querySelector('#default');
-    pointDiv(def);
-
-    // add a pointer and link to a div
-    function pointDiv(div) {
-      div.style.cursor = 'pointer';
-      div.onclick = function() {
-        window.location.href = 'www.google.com';
-      };
-    }
-
-    // Make add button a link
-    let add = document.querySelector('.add-box');
-    // Get the add channel element
-    let addChannel = document.querySelector('#add-channel');
-    add.style.cursor = 'pointer';
-
-    // Get new Channel
-    let newChannel = document.querySelector('#new-channel');
-    // Open Add Channel Input
-    add.onclick = function() {
-      // Make input field visible
-      if (newChannel.style.visibility == 'visible') {
-        newChannel.style.visibility = 'hidden';
-        // Focus back on the message input
-        input.focus();
-        input.select();
-      }
-      else {
-        newChannel.style.visibility = 'visible';
-        // Focus on the addChannel input field
-        addChannel.focus();
-        addChannel.select();
-      }
-    };
-
-    // Add a new channel
-    addChannel.addEventListener('keydown', function(e) {
-      let channel = addChannel.value;
-      if (e.code === "Enter" && channel) {
-          // Make Channel
-          makeChannel(channel);
-          // Reset text field
-          input.value = '';
-          newChannel.style.visibility = 'hidden';
-          // Focus back on the message input
-          input.focus();
-          input.select();
-          }
-    });
-
-
-    // Focus the Input Field on Intial Load
-    let input = document.getElementById('send');
-    input.focus();
-    input.select();
-    // Get input by enter key
-    input.addEventListener('keydown', function(e) {
-    let message = input.value;
-    if (e.code === "Enter" && message) {
-        // Send Message
-        addSent(message);
-        console.log(message);
-        // Reset text field
-        input.value = '';
-        }
-    });
-
-    function addSent(message) {
-      // Get message div
-      let div = document.getElementById('message-div');
-
-      // Build message bubble div
-      let bubble = document.createElement('div');
-      bubble.classList.add('message');
-      text = document.createElement('a');
-      text.innerHTML = message;
-      bubble.appendChild(text);
-
-      // Append message to div
-      div.appendChild(bubble);
-      // Keep scrolled to bottom of messages
-      window.scrollTo(0,document.body.scrollHeight);
-    }
-
-    function makeChannel(channel) {
-      let div = document.getElementById('channel-div');
-      // Build channel tag
-      let tag = document.createElement('div');
-      tag.classList.add('channel-box');
-      heading = document.createElement('h5');
-      heading.classList.add('channels');
-      heading.innerHTML = '<i class="fa fa-hashtag"></i> ' + channel;
-      tag.appendChild(heading);
-      div.appendChild(tag);
-      // Get a pointer for the div
-      pointDiv(div);
-
-    }
-
-  });
-</script>
 </head>
 <body>
 
@@ -259,7 +150,7 @@ svg {
   <div class="input-group" id="new-channel">
     <input type="text" class="form-control"  id="add-channel" placeholder="Channel Name" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     <div class="input-group-append">
-      <button class="btn btn-secondary" type="button"><i class="fa fa-plus"></i></button>
+      <button class="btn btn-secondary" id="add-channel-btn" type="button"><i class="fa fa-plus"></i></button>
     </div>
   </div>
 
