@@ -9,13 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Send Message to Server
   function sendMessage(message) {
+  // Get timestamp
+  const d = new Date();
+  const time = d.getHours() + ":" + d.getMinutes();
   // Emit send message
-    socket.emit('send message', {'message': message, 'from': user});
+    socket.emit('send message', {'message': message, 'from': user, 'time': time});
   }
 
   // Recieve the message from server
   socket.on('recieve message', messages => {
-      addSent(messages.message, messages.from)
+      addSent(messages.message, messages.from, messages.time)
   });
 
   // Point the default div
@@ -104,23 +107,49 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   });
 
+  // Get input by button
+  document.getElementById('send-btn').addEventListener('click', function() {
+    let message = input.value;
+    if (message) {
+      // Send message
+      sendMessage(message);
+      // Rest text Field
+      input.value = '';
+    }
+  });
+
   // Add Message to the DOM
-  function addSent(message, from) {
+  function addSent(message, from, time) {
     // Get message div
     let div = document.getElementById('message-div');
 
     // Build message bubble div
     let bubble = document.createElement('div');
     bubble.classList.add('message');
+
     // append name tag
     let name = document.createElement('a');
     name.classList.add('from');
+    // Change styling if message is from us or another user
+    if (from == user) {
+      name.classList.add('user');
+      bubble.classList.add('m-user');
+    }
+    else {
+      name.classList.add('other');
+      bubble.classList.add('m-other')
+    }
     name.innerHTML = from;
     bubble.appendChild(name);
     // append message text
     text = document.createElement('a');
     text.innerHTML = message;
     bubble.appendChild(text);
+    // Append time to div
+    stamp = document.createElement('a');
+    stamp.classList.add('time');
+    stamp.innerHTML = time;
+    bubble.appendChild(stamp);
     // Append message to div
     div.appendChild(bubble);
     // Add a break after the message

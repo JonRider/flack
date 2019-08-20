@@ -113,31 +113,52 @@ svg {
 
 .message {
   display: inline-block;
-  background-color: #eceff1;
   border-radius: 10px;
-  border-width: 5px;
   border-left-style: solid;
-  border-color: #7283a7;
+  border-width: 5px;
   padding: 5px 20px 10px 10px;
   margin-top: 10px;
   max-width: 80%;
+  font-size: 0;
+}
 
+.m-user {
+  background-color: #eceff1;
+  border-color: #7283a7;
+  margin-left: 60px;
+}
+
+.m-other {
+  background-color: #f1f8e9;
+  border-color: #aed581;
 }
 
 .message a {
-  font-size: 22px;
-  padding-top: 1px;
+  font-size: 18px;
 }
 
 .from {
-  font-size: 18px !important;
-  color: #4527a0 !important;
+  font-size: 16px !important;
   font-weight: bold;
 }
 
-.from:after {
+.user {
+  color: #4527a0 !important;
+}
+
+.other {
+  color: #007E33 !important;
+}
+
+.from:after, .message a:after {
   content: '\A';
   white-space: pre;
+}
+
+.time {
+  font-size: 12px !important;
+  font-weight: lighter;
+  color: #9e9e9e !important;
 }
 
 </style>
@@ -178,12 +199,16 @@ svg {
   <div class="message">
     <a class="from">Jon</a>
     <a>This is a message.</a>
+    <a class="time">12:31</a>
   </div>
 
   <!-- Message Bar -->
   <div class="bottom-bar">
     <div class="input-group message-bar">
-      <input type="text" class="form-control message-bar" id="send" placeholder="Enter Message Here" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+      <input type="text" class="form-control" id="send" placeholder="Enter Message Here" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+      <div class="input-group-append message-bar">
+        <button class="btn btn-secondary" id="send-btn" type="button"><i class="fa fa-paper-plane"></i></button>
+      </div>
     </div>
   </div>
 </div>
