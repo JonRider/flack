@@ -126,6 +126,18 @@ svg {
 
 .message a {
   font-size: 22px;
+  padding-top: 1px;
+}
+
+.from {
+  font-size: 18px !important;
+  color: #4527a0 !important;
+  font-weight: bold;
+}
+
+.from:after {
+  content: '\A';
+  white-space: pre;
 }
 
 </style>
@@ -161,6 +173,11 @@ svg {
 
   <!-- Message Div -->
   <div id="message-div">
+  </div>
+
+  <div class="message">
+    <a class="from">Jon</a>
+    <a>This is a message.</a>
   </div>
 
   <!-- Message Bar -->

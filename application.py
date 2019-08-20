@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-messages = {"message": ""}
+messages = {"message": "", "from": ""}
 
 @app.route("/")
 def index():
@@ -17,4 +17,5 @@ def index():
 @socketio.on("send message")
 def message(data):
     messages["message"] = data["message"]
+    messages["from"] = data["from"]
     emit("recieve message", messages, broadcast=True)

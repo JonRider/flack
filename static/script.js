@@ -1,17 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+  // Get username
+  var user = localStorage.getItem('user') ? localStorage.getItem('user') : prompt("Please enter your display name", "Name");
+  localStorage.setItem("user", user);
+
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
   // Send Message to Server
   function sendMessage(message) {
   // Emit send message
-    socket.emit('send message', {'message': message});
+    socket.emit('send message', {'message': message, 'from': user});
   }
 
   // Recieve the message from server
   socket.on('recieve message', messages => {
-      addSent(messages.message)
+      addSent(messages.message, messages.from)
   });
 
   // Point the default div
@@ -84,42 +88,49 @@ document.addEventListener('DOMContentLoaded', function() {
     input.select();
   }
 
-
   // Focus the Input Field on Intial Load
   let input = document.getElementById('send');
   input.focus();
   input.select();
+
   // Get input by enter key
   input.addEventListener('keydown', function(e) {
   let message = input.value;
   if (e.code === "Enter" && message) {
       // Send Message
-      //addSent(message);
       sendMessage(message);
-      console.log(message);
       // Reset text field
       input.value = '';
       }
   });
 
-  function addSent(message) {
+  // Add Message to the DOM
+  function addSent(message, from) {
     // Get message div
     let div = document.getElementById('message-div');
 
     // Build message bubble div
     let bubble = document.createElement('div');
     bubble.classList.add('message');
+    // append name tag
+    let name = document.createElement('a');
+    name.classList.add('from');
+    name.innerHTML = from;
+    bubble.appendChild(name);
+    // append message text
     text = document.createElement('a');
     text.innerHTML = message;
     bubble.appendChild(text);
     // Append message to div
     div.appendChild(bubble);
-    linebreak = document.createElement("br");
+    // Add a break after the message
+    linebreak = document.createElement('br');
     div.appendChild(linebreak);
     // Keep scrolled to bottom of messages
     window.scrollTo(0,document.body.scrollHeight);
   }
 
+  // Add channel to the DOM
   function makeChannel(channel) {
     let div = document.getElementById('channel-div');
     // Build channel tag
