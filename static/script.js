@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
+  // When connected after page reload update channels
+    socket.on('connect', () => {
+        socket.emit('load channels');
+    });
+
+    // Recieve the channel list from server
+    socket.on('update list', channels_list => {
+      clearChannels();
+      channels_list.forEach(function(e) {
+          makeChannel(e);
+      });
+    });
+
   // Send Message to Server
   function sendMessage(message) {
   // Get timestamp
@@ -21,9 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
       addSent(messages.message, messages.from, messages.time)
   });
 
-  // Point the default div
-  let def = document.querySelector('#default');
-  pointDiv(def);
+  // Send Channel to server
+  function sendChannel(channel) {
+    // Emit channel
+    socket.emit('send channel', {'channel': channel});
+  }
+
+  // Recieve the channel from server
+  socket.on('post channel', channel => {
+      makeChannel(channel.channel)
+  });
 
   // add a pointer and link to a div
   function pointDiv(div) {
@@ -66,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let channel = addChannel.value;
     if (e.code === "Enter" && channel) {
         // Make Channel
-        makeChannel(channel);
+        sendChannel(channel);
         hideChannelInput();
         }
   });
@@ -76,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let channel = addChannel.value;
     if (channel) {
         // Make Channel
-        makeChannel(channel);
+        sendChannel(channel);
         hideChannelInput();
         }
   });
@@ -173,6 +193,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get a pointer for the div
     pointDiv(div);
 
+  }
+
+  // Clear all channels
+  function clearChannels() {
+    let div = document.getElementById('channel-div');
+    while (div.hasChildNodes()) {
+      div.removeChild(div.lastChild);
+    }
   }
 
 });

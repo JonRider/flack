@@ -9,6 +9,8 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
 messages = {"message": "", "from": "", "time": ""}
+channels = {"channel": ""}
+channels_list = ["default",]
 
 @app.route("/")
 def index():
@@ -20,3 +22,15 @@ def message(data):
     messages["from"] = data["from"]
     messages["time"] = data["time"]
     emit("recieve message", messages, broadcast=True)
+
+@socketio.on("send channel")
+def channel(data):
+    if data["channel"] not in channels_list:
+        channels["channel"] = data["channel"]
+        channels_list.append(data["channel"])
+        emit("post channel", channels, broadcast=True)
+
+@socketio.on("load channels")
+def load():
+
+    emit("update list", channels_list, broadcast=True)
