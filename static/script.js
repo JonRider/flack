@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const d = new Date();
   const time = d.getHours() + ":" + d.getMinutes();
   // Emit send message
-    socket.emit('send message', {'message': message, 'from': user, 'time': time});
+    socket.emit('send message', {'message': message, 'from': user, 'time': time, 'channel': current_channel});
   }
 
   // Recieve the message from server
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tag.onclick = function(e) {
       clearSelected();
       tag.classList.add('selected');
-      console.log(e.target.innerText.trim());
+      loadChannel(e.target.innerText.trim());
     };
     div.appendChild(tag);
   }
@@ -208,5 +208,23 @@ document.addEventListener('DOMContentLoaded', function() {
       c[i].classList.remove('selected');
     }
   }
+
+  // Load the channels messages
+  function loadChannel(name) {
+    // If channel is not already selected
+    if(name != current_channel) {
+      current_channel = name;
+      socket.emit('load channel messages', {'channel': name});
+    }
+  }
+
+  // Recieve channel messages from server
+  socket.on('recieve message list', channel_messages => {
+    // Add each message to the display
+    channel_messages.forEach(function(e) {
+        addSent(e.message, e.from, e.time);
+    });
+  });
+
 
 });

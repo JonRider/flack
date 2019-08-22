@@ -11,26 +11,42 @@ socketio = SocketIO(app)
 messages = {"message": "", "from": "", "time": ""}
 channels = {"channel": ""}
 channels_list = ["default",]
+message_list = {"default": []}
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# Send messages
 @socketio.on("send message")
 def message(data):
     messages["message"] = data["message"]
     messages["from"] = data["from"]
     messages["time"] = data["time"]
+    selected = data["channel"]
+    message_list[selected].append(messages)
     emit("recieve message", messages, broadcast=True)
 
+# Send and get new channels to the server
 @socketio.on("send channel")
 def channel(data):
+    # Add channel only if it doesn't already exist
     if data["channel"] not in channels_list:
         channels["channel"] = data["channel"]
         channels_list.append(data["channel"])
+        # Add channel name to the message list with a blank array
+        message_list[data["channel"]] = []
         emit("post channel", channels, broadcast=True)
 
+# Load created channels on page refresh or new client user
 @socketio.on("load channels")
-def load():
+def loadChannels():
 
     emit("update list", channels_list, broadcast=True)
+
+# Load messages on selected channel
+@socketio.on("load channel messages")
+def loadMessages(data):
+    selected = data["channel"]
+    channel_messages = message_list[selected]
+    emit("recieve message list", channel_messages, broadcast=True)
