@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Get last channel
   var current_channel = localStorage.getItem('current') ? localStorage.getItem('current') : "default";
+  localStorage.setItem('current', current_channel);
+
+  // Load last channel
+  loadChannel(localStorage.getItem('current'));
+
 
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -21,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
       channels_list.forEach(function(e) {
           makeChannel(e);
       });
+      // highlight current channel
+      highlightDiv();
     });
 
   // Send Message to Server
@@ -34,7 +41,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Recieve the message from server
   socket.on('recieve message', messages => {
-      addSent(messages.message, messages.from, messages.time)
+      // Only add to screen if submited on curent channel
+      if(current_channel == messages.channel) {
+        addSent(messages.message, messages.from, messages.time)
+      }
   });
 
   // Send Channel to server
@@ -201,7 +211,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Clear selected
+  // Clear all messages
+  function clearMessages() {
+    let div = document.getElementById('message-div');
+    while (div.hasChildNodes()) {
+      div.removeChild(div.lastChild);
+    }
+  }
+
+  // Clears all selected channels selected class which makes it look active
   function clearSelected() {
     let c = document.getElementById('channel-div').children;
     for (i = 0; i < c.length; i++) {
@@ -209,22 +227,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // finds the current channel and hightlights it
+  function highlightDiv() {
+      let c = document.getElementById('channel-div').children;
+      for (i = 0; i < c.length; i++) {
+        if(c[i].innerText.trim() == current_channel) {
+          eventFire(c[i], 'click');
+        }
+      }
+  }
+
   // Load the channels messages
   function loadChannel(name) {
     // If channel is not already selected
     if(name != current_channel) {
       current_channel = name;
-      socket.emit('load channel messages', {'channel': name});
+      localStorage.setItem('current', current_channel);
+      socket.emit('load channel messages', {'channel': current_channel});
     }
   }
 
   // Recieve channel messages from server
   socket.on('recieve message list', channel_messages => {
+    // clear previous messages
+    clearMessages();
     // Add each message to the display
+    console.log(channel_messages);
     channel_messages.forEach(function(e) {
         addSent(e.message, e.from, e.time);
     });
   });
+
+  // To fire the event of the last channel being clicked on
+  function eventFire(el, etype){
+  if (el.fireEvent) {
+    el.fireEvent('on' + etype);
+  } else {
+    var evObj = document.createEvent('Events');
+    evObj.initEvent(etype, true, false);
+    el.dispatchEvent(evObj);
+  }
+}
 
 
 });

@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-messages = {"message": "", "from": "", "time": ""}
+messages = {"message": "", "from": "", "time": "", "channel": ""}
 channels = {"channel": ""}
 channels_list = ["default",]
 message_list = {"default": []}
@@ -23,8 +23,9 @@ def message(data):
     messages["message"] = data["message"]
     messages["from"] = data["from"]
     messages["time"] = data["time"]
+    messages["channel"] = data["channel"]
     selected = data["channel"]
-    message_list[selected].append(messages)
+    message_list[selected].append(data)
     emit("recieve message", messages, broadcast=True)
 
 # Send and get new channels to the server
@@ -47,6 +48,5 @@ def loadChannels():
 # Load messages on selected channel
 @socketio.on("load channel messages")
 def loadMessages(data):
-    selected = data["channel"]
-    channel_messages = message_list[selected]
-    emit("recieve message list", channel_messages, broadcast=True)
+
+    emit("recieve message list", message_list[data["channel"]], broadcast=True)
