@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var user = localStorage.getItem('user') ? localStorage.getItem('user') : prompt("Please enter your display name", "Name");
   localStorage.setItem("user", user);
 
+  // Get last channel
+  var current_channel = localStorage.getItem('current') ? localStorage.getItem('current') : "default";
+
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -44,14 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('post channel', channel => {
       makeChannel(channel.channel)
   });
-
-  // add a pointer and link to a div
-  function pointDiv(div) {
-    div.style.cursor = 'pointer';
-    div.onclick = function() {
-      window.location.href = 'www.google.com';
-    };
-  }
 
   // Make add button a link
   let add = document.querySelector('.add-box');
@@ -189,10 +184,13 @@ document.addEventListener('DOMContentLoaded', function() {
     heading.classList.add('channels');
     heading.innerHTML = '<i class="fa fa-hashtag"></i> ' + channel;
     tag.appendChild(heading);
+    tag.style.cursor = 'pointer';
+    tag.onclick = function(e) {
+      clearSelected();
+      tag.classList.add('selected');
+      console.log(e.target.innerText.trim());
+    };
     div.appendChild(tag);
-    // Get a pointer for the div
-    pointDiv(div);
-
   }
 
   // Clear all channels
@@ -200,6 +198,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let div = document.getElementById('channel-div');
     while (div.hasChildNodes()) {
       div.removeChild(div.lastChild);
+    }
+  }
+
+  // Clear selected
+  function clearSelected() {
+    let c = document.getElementById('channel-div').children;
+    for (i = 0; i < c.length; i++) {
+      c[i].classList.remove('selected');
     }
   }
 
