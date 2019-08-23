@@ -23,7 +23,7 @@ def message(data):
     # Add messages to message list under appropriate channel heading
     message_list[data["channel"]].append(data)
     # Remove first message if channel message list is longer than 100
-    if len(message_list[data["channel"]]) > 99:
+    if len(message_list[data["channel"]]) > 100:
         message_list[data["channel"]].pop(0)
     emit("recieve message", data, broadcast=True)
 
@@ -46,5 +46,12 @@ def loadChannels():
 # Load messages on selected channel
 @socketio.on("load channel messages")
 def loadMessages(data):
+    data_list = {"channel": data["channel"], "messages": message_list[data["channel"]]}
+    emit("recieve message list", data_list, broadcast=True)
 
-    emit("recieve message list", message_list[data["channel"]], broadcast=True)
+# Delete Channel and all channel messages
+@socketio.on("delete channel")
+def deleteChannel(data):
+    message_list.pop(data["channel"])
+    channels_list.pop(channels_list.index(data["channel"]))
+    emit("channel delete", broadcast=True)

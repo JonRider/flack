@@ -195,7 +195,19 @@ document.addEventListener('DOMContentLoaded', function() {
     heading = document.createElement('h5');
     heading.classList.add('channels');
     heading.innerHTML = '<i class="fa fa-hashtag"></i> ' + channel;
+    // If not default channel
+    if(heading.innerText.trim() != 'default') {
+      // Add remove Button
+      remove = document.createElement('i');
+      remove.classList.add('fa', 'fa-minus-circle', 'white');
+      remove.onclick = function() {
+        removeChannel(tag, heading.innerText.trim());
+      };
+      heading.appendChild(remove);
+    }
+    // Append heading to tag
     tag.appendChild(heading);
+    // Setup Click Event for tag
     tag.style.cursor = 'pointer';
     tag.onclick = function(e) {
       clearSelected();
@@ -233,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function highlightDiv() {
       let c = document.getElementById('channel-div').children;
       for (i = 0; i < c.length; i++) {
-        if(c[i].innerText.trim() == current_channel) {
+        if(c[i].innerText.trim() == localStorage.getItem('current')) {
           eventFire(c[i], 'click');
         }
       }
@@ -250,18 +262,28 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Recieve channel messages from server
-  socket.on('recieve message list', channel_messages => {
+  socket.on('recieve message list', data_list => {
     // clear previous messages
-    clearMessages();
-    // Add each message to the display
-    console.log(channel_messages);
-    channel_messages.forEach(function(e) {
-        addSent(e.message, e.from, e.time);
-    });
+
+    console.log(data_list.channel);
+    channel_messages = data_list.messages;
+
+    if(data_list.channel == localStorage.getItem('current')) {
+      clearMessages();
+      // Add each message to the display
+      channel_messages.forEach(function(e) {
+          addSent(e.message, e.from, e.time);
+      });
+
+      // Highlight the current users channel in case another user requested this
+      highlightDiv()
+    }
+
+
   });
 
   // To fire the event of the last channel being clicked on
-  function eventFire(el, etype){
+  function eventFire(el, etype) {
   if (el.fireEvent) {
     el.fireEvent('on' + etype);
   } else {
@@ -270,6 +292,25 @@ document.addEventListener('DOMContentLoaded', function() {
     el.dispatchEvent(evObj);
   }
 }
+
+  // Remove a Channel
+  function removeChannel(tag, channel) {
+    // Remove from DOM
+    tag.remove();
+    // Delete from Server
+    socket.emit('delete channel', {'channel': channel});
+  }
+
+  // Recieve channel messages from server
+  socket.on('channel delete', () => {
+    // clear previous messages
+    clearMessages();
+    // Load the default channel
+    current_channel = 'default';
+    localStorage.setItem('current', current_channel);
+    socket.emit('load channel messages', {'channel': current_channel});
+    highlightDiv();
+  });
 
 
 });
