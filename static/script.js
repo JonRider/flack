@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load last channel
   loadChannel(localStorage.getItem('current'));
-
+  // Hit channel on page refresh
+  highlightDiv();
 
   // Connect to websocket
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // When connected after page reload update channels
     socket.on('connect', () => {
         socket.emit('load channels');
+        socket.emit('load channel messages', {'channel': current_channel});
     });
 
     // Recieve the channel list from server
