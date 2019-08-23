@@ -22,6 +22,9 @@ def index():
 def message(data):
     # Add messages to message list under appropriate channel heading
     message_list[data["channel"]].append(data)
+    # Remove first message if channel message list is longer than 100
+    if len(message_list[data["channel"]]) > 99:
+        message_list[data["channel"]].pop(0)
     emit("recieve message", data, broadcast=True)
 
 # Send and get new channels to the server
