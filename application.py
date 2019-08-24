@@ -48,10 +48,3 @@ def loadChannels():
 def loadMessages(data):
     data_list = {"channel": data["channel"], "messages": message_list[data["channel"]]}
     emit("recieve message list", data_list, broadcast=True)
-
-# Delete Channel and all channel messages
-@socketio.on("delete channel")
-def deleteChannel(data):
-    message_list.pop(data["channel"])
-    channels_list.pop(channels_list.index(data["channel"]))
-    emit("channel delete", broadcast=True)
