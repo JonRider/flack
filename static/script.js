@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Make add button a link
   let add = document.querySelector('.add-box');
-  add.style.cursor = 'pointer';
   // Get the add channel element
   let addChannel = document.querySelector('#add-channel');
 
@@ -149,20 +148,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Hide Color Picker bar
+  let colorBar = document.getElementById('change');
+  let colors = document.querySelector('.colors');
+  colorBar.onclick = function() {
+    // Make pallate invisible
+    if (colors.style.visibility == 'visible') {
+      colors.style.visibility = 'hidden';
+    }
+    else {
+      colors.style.visibility = 'visible';
+    }
+  };
+
   // Listeners for color selectors
-  var colorBox = document.getElementsByClassName("color-box");
   document.getElementById('color-1').addEventListener('click', function(e) {
     pickColor(e.target.id);
+    colors.style.visibility = 'hidden';
   });
 
-  var colorBox = document.getElementsByClassName("color-box");
   document.getElementById('color-2').addEventListener('click', function(e) {
     pickColor(e.target.id);
+    colors.style.visibility = 'hidden';
   });
 
-  var colorBox = document.getElementsByClassName("color-box");
   document.getElementById('color-3').addEventListener('click', function(e) {
     pickColor(e.target.id);
+    colors.style.visibility = 'hidden';
+  });
+
+  document.getElementById('color-4').addEventListener('click', function(e) {
+    pickColor(e.target.id);
+    colors.style.visibility = 'hidden';
   });
 
   // Pick the correct color
@@ -174,8 +191,11 @@ document.addEventListener('DOMContentLoaded', function() {
     else if(color == 'color-2') {
       userColor = 'm-user-2';
     }
-    else {
+    else if(color == 'color-3') {
       userColor = 'm-user-3';
+    }
+    else {
+      userColor = 'm-user-4';
     }
     localStorage.setItem("color", userColor);
     socket.emit('load channel messages', {'channel': localStorage.getItem('current')});
@@ -201,8 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
       else if (userColor == 'm-user-2') {
         name.classList.add('user-2');
       }
-      else {
+      else if (userColor == 'm-user-3') {
         name.classList.add('user-3');
+      }
+      else {
+        name.classList.add('user-4');
       }
       bubble.classList.add(userColor);
     }
