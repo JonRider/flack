@@ -184,7 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Pick the correct color
   function pickColor(color) {
-    console.log("Color is: " + color);
     if(color == 'color-1') {
       userColor = 'm-user';
     }
@@ -322,7 +321,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Recieve channel messages from server
   socket.on('recieve message list', data_list => {
     // clear previous messages
-    console.log("Messages for channel: " + data_list.channel + " Current Channel:" + localStorage.getItem('current'));
     channel_messages = data_list.messages;
     if(data_list.channel == localStorage.getItem('current')) {
       clearMessages();
